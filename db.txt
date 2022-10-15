@@ -1,0 +1,77 @@
+
+$ sudo -u postgres psql
+
+postgres=# CREATE USER <dbuser> WITH PASSWORD <dbpassword>;
+postgres=# CREATE DATABASE <dbname>;
+postgres=# GRANT ALL PRIVILEGES ON DATABASE <dbname> TO <dbuser>;
+
+List all users
+postgres=# \du
+
+List all tables
+postgres=# \dt
+
+List all databases
+postgres=# \list (or \l)
+
+Connect to a database
+\connect <dbname> 
+
+
+CREATE TABLE users(
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(50) UNIQUE NOT NULL,
+    fullName VARCHAR(50) NOT NULL,
+    password VARCHAR(128) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    phone INTEGER,
+    image VARCHAR(255)
+);
+
+CREATE TABLE categories(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE subcategories(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL,
+    category INT NOT NULL,
+    CONSTRAINT fk_category
+      FOREIGN KEY(category) 
+	  REFERENCES categories(id)
+      ON DELETE CASCADE
+);
+
+CREATE TABLE tickets(
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(128) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    createdAt TIMESTAMP DEFAULT NOW(),
+    closedAt TIMESTAMP,
+    status VARCHAR(30) NOT NULL,
+    priority VARCHAR(30) NOT NULL,
+    createdby INT NOT NULL,
+    assignee INT NOT NULL,
+    CONSTRAINT fk_createdby
+      FOREIGN KEY(createdby) 
+	  REFERENCES users(id)
+      ON DELETE CASCADE,
+    CONSTRAINT fk_assignee
+      FOREIGN KEY(assignee) 
+	  REFERENCES users(id)
+      ON DELETE CASCADE
+); 
+
+CREATE TABLE stocks(
+    id SERIAL PRIMARY KEY,
+    subcategory INT NOT NULL,
+    name VARCHAR(128) NOT NULL,
+    model VARCHAR(128) NOT NULL,
+    quantity INT NOT NULL,
+    CONSTRAINT fk_subcategory
+      FOREIGN KEY(subcategory) 
+	  REFERENCES subcategories(id)
+      ON DELETE CASCADE
+); 
